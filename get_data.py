@@ -13,6 +13,12 @@ html = soup(webpage, "html.parser")
 
 fundamentals = pd.read_html(str(html), attrs = {'class': 'snapshot-table2'})[0]
 fundamentals = pd.DataFrame(fundamentals)
+fundamentals.to_csv('table.csv') 
 
-# fundamentals.to_csv('table.csv')  
-print(fundamentals)
+df = pd.read_csv('table.csv')
+print(df['5'])
+
+EPS_next_Y=df['5']
+EPS_next_Y = EPS_next_Y[4]
+
+print(EPS_next_Y) 
