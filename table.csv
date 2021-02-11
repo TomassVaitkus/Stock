@@ -1,13 +1,13 @@
 ,0,1,2,3,4,5,6,7,8,9,10,11
-0,Index,-,P/E,-,EPS (ttm),-0.92,Insider Own,0.80%,Shs Outstand,186.00M,Perf Week,13.87%
-1,Market Cap,3.93B,Forward P/E,18.47,EPS next Y,1.18,Insider Trans,-0.02%,Shs Float,184.62M,Perf Month,-12.93%
-2,Income,-170.00M,PEG,-,EPS next Q,0.38,Inst Own,78.00%,Short Float,6.04%,Perf Quarter,50.69%
-3,Sales,9.29B,P/S,0.42,EPS this Y,-559.70%,Inst Trans,1.50%,Short Ratio,1.88,Perf Half Y,39.76%
-4,Book/sh,18.25,P/B,1.19,EPS next Y,-23.46%,ROA,-4.60%,Target Price,22.14,Perf Year,41.12%
-5,Cash/sh,9.60,P/C,2.27,EPS next 5Y,-,ROE,-16.60%,52W Range,5.16 - 26.20,Perf YTD,-5.60%
-6,Dividend,-,P/FCF,16.05,EPS past 5Y,-34.10%,ROI,-9.60%,52W High,-16.41%,Beta,2.62
-7,Dividend %,-,Quick Ratio,1.20,Sales past 5Y,-4.50%,Gross Margin,14.20%,52W Low,324.42%,ATR,1.10
-8,Employees,13800,Current Ratio,1.80,Sales Q/Q,-7.90%,Oper. Margin,-1.40%,RSI (14),56.00,Volatility,4.03% 5.04%
-9,Optionable,Yes,Debt/Eq,0.75,EPS Q/Q,77.80%,Profit Margin,-6.90%,Rel Volume,1.88,Prev Close,21.76
-10,Shortable,Yes,LT Debt/Eq,0.75,Earnings,Jan 20 AMC,Payout,-,Avg Volume,5.92M,Price,21.90
-11,Recom,2.60,SMA20,4.54%,SMA50,-0.49%,SMA200,46.88%,Volume,1582458,Change,0.64%
+0,Index,S&P; 500,P/E,54.34,EPS (ttm),2.30,Insider Own,0.30%,Shs Outstand,309.00M,Perf Week,2.40%
+1,Market Cap,38.66B,Forward P/E,29.98,EPS next Y,4.17,Insider Trans,-19.41%,Shs Float,304.52M,Perf Month,-2.40%
+2,Income,719.00M,PEG,5.84,EPS next Q,0.89,Inst Own,90.60%,Short Float,0.75%,Perf Quarter,11.18%
+3,Sales,5.34B,P/S,7.24,EPS this Y,-31.60%,Inst Trans,0.66%,Short Ratio,1.25,Perf Half Y,29.89%
+4,Book/sh,15.77,P/B,7.93,EPS next Y,12.82%,ROA,7.50%,Target Price,125.71,Perf Year,47.00%
+5,Cash/sh,4.66,P/C,26.83,EPS next 5Y,9.30%,ROE,14.80%,52W Range,61.13 - 129.34,Perf YTD,5.56%
+6,Dividend,0.78,P/FCF,66.65,EPS past 5Y,12.00%,ROI,10.00%,52W High,-3.29%,Beta,1.01
+7,Dividend %,0.62%,Quick Ratio,1.80,Sales past 5Y,5.70%,Gross Margin,53.10%,52W Low,104.61%,ATR,2.75
+8,Employees,16400,Current Ratio,2.30,Sales Q/Q,8.50%,Oper. Margin,15.80%,RSI (14),57.11,Volatility,1.92% 1.99%
+9,Optionable,Yes,Debt/Eq,0.48,EPS Q/Q,14.40%,Profit Margin,13.50%,Rel Volume,0.60,Prev Close,123.24
+10,Shortable,Yes,LT Debt/Eq,0.47,Earnings,Feb 16 AMC,Payout,30.30%,Avg Volume,1.82M,Price,125.08
+11,Recom,2.20,SMA20,0.67%,SMA50,3.67%,SMA200,22.80%,Volume,1097451,Change,1.49%

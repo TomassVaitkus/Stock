@@ -16,7 +16,6 @@ fundamentals = pd.DataFrame(fundamentals)
 fundamentals.to_csv('table.csv') 
 
 df = pd.read_csv('table.csv')
-print(df['5'])
 
 EPS_next_Y=df['5']
 EPS_next_Y = EPS_next_Y[4]
