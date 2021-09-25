@@ -1,23 +1,26 @@
+import requests
 import pandas as pd
-import numpy as np
-from bs4 import BeautifulSoup as soup
-from urllib.request import Request, urlopen
 
-ticker = input(str('Enter a Ticker: '))
-url = ('https://finviz.com/quote.ashx?t='+ ticker +'&ty=c&p=d&b=1')
-
-req = Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-webpage = urlopen(req).read()
-html = soup(webpage, "html.parser")
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
 
-fundamentals = pd.read_html(str(html), attrs = {'class': 'snapshot-table2'})[0]
-fundamentals = pd.DataFrame(fundamentals)
-fundamentals.to_csv('table.csv') 
+def get_screener(version):
+    screen = requests.get(f'https://finviz.com/screener.ashx?v={version}&f=ind_consumerelectronics,sec_technology', headers = headers).text
 
-df = pd.read_csv('table.csv')
+    tables = pd.read_html(screen)
+    tables = tables[-2]
+    tables.columns = tables.iloc[0]
+    tables = tables[1:]
 
-EPS_next_Y=df['5']
-EPS_next_Y = EPS_next_Y[4]
+    return tables
 
-print(EPS_next_Y) 
+tables111 = get_screener('111')
+tables161 = get_screener('161')
+tables121 = get_screener('121')
+
+consolidatedtables = pd.merge(tables111,tables161,how='outer',left_on='Ticker',right_on='Ticker')
+consolidatedtables = pd.merge(consolidatedtables,tables121,how='outer',left_on='Ticker',right_on='Ticker')
+
+consolidatedtables.to_csv('data.csv')
+
+print(consolidatedtables)
