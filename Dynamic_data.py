@@ -24,8 +24,7 @@ table_for_annual = pd.DataFrame(columns = new_row_data_annual)
 def get_data_from_db(inp2):
     conn = sql.connect('data_base.db')
     result = pd.read_sql('SELECT Ticker FROM ' + inp2, conn)
-    conn.close()
-    return result
+    conn.close()    return result
 
 table_2017  = get_data_from_db('main_tbl')
 table_2018  = get_data_from_db('main_tbl')
