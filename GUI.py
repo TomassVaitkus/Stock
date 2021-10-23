@@ -5,7 +5,9 @@ from tkinter import *
 
 root = Tk()
 root.geometry('500x500')
-root.title('Finance Clustering')
+root.title('Companies Clustering Aplication')
+
+
 
 
 root.mainloop()

@@ -21,6 +21,7 @@ sample_quarter = pd.read_html('https://www.marketwatch.com/investing/stock/amzn/
 sample_table_quarter = sample_quarter[4]
 sample_annual = pd.read_html('https://www.marketwatch.com/investing/stock/amzn/financials/income')
 sample_table_annual = sample_annual[4]
+
 for ticker in tickers['Ticker']:
     list_of_features_quarter = []
     try:
@@ -60,16 +61,16 @@ for ticker in tickers['Ticker']:
 for ticker in tickers['Ticker']:
     list_of_features_annual = []
     try:
-        df_annual = pd.read_html(f'https://www.marketwatch.com/investing/stock/{ticker}/financials/income/quarter')
+        df_annual = pd.read_html(f'https://www.marketwatch.com/investing/stock/{ticker}/financials/income')
         if len(df_annual) > 4:
             data_frame_annual_tmp = df_annual[4]
-            if 'Item  Item' in data_frame_annual_tmp and '5- qtr trend' in data_frame_annual_tmp:
+            if 'Item  Item' in data_frame_annual_tmp and '5-year trend' in data_frame_annual_tmp:
                 if data_frame_annual_tmp['Item  Item'].equals(sample_table_annual['Item  Item']):
                     for row in data_frame_annual_tmp['Item  Item']:
                         feature_name = row.rstrip()[:int(len(row) / 2)].rstrip()
                         list_of_features_annual.append(feature_name)
                     data_frame_annual_tmp['Features'] = list(list_of_features_annual)
-                    data_frame_annual_tmp = data_frame_annual_tmp.drop(['Item  Item', '5- qtr trend'], axis=1)
+                    data_frame_annual_tmp = data_frame_annual_tmp.drop(['Item  Item', '5-year trend'], axis=1)
                     first_col_quarter = data_frame_annual_tmp.pop('Features')
                     data_frame_annual_tmp.insert(0, 'Features', first_col_quarter)
                     data_frame_annual = data_frame_annual_tmp.transpose()

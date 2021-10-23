@@ -1,3 +1,5 @@
+import datetime
+
 import pandas as pd
 import sqlite3 as sql
 
@@ -8,14 +10,20 @@ def get_data_from_db(inp2):
     conn.close()
     return result
 
+def set_to_database(inp1, inp2):
+    conn = sql.connect('data_base.db')
+    inp1.to_sql(inp2, conn, if_exists='append', index=False)
+    conn.close()
 
-# def prep_data():
 
 
 annual_from_db = get_data_from_db('annual_data')
 annual_from_db = annual_from_db.drop(['index'], axis=1).astype(str)
 
+quater_from_db = get_data_from_db('quarter_data')
+quater_from_db = quater_from_db.drop(['index'], axis=1).astype(str)
 
+first = datetime.datetime.now()
 for column in annual_from_db.iloc[:, 2:]:
     for i in range(len(annual_from_db[column])):
         if "(" in annual_from_db[column][i]:
@@ -28,6 +36,12 @@ for column in annual_from_db.iloc[:, 2:]:
             elif 'K' in annual_from_db[column][i]:
                 converted2 = float(annual_from_db[column][i].replace('(', '').replace(')', '').replace('K', ''))
                 annual_from_db[column][i] = -abs(converted2)/1000
+            elif 'T' in annual_from_db[column][i]:
+                converted3 = float(annual_from_db[column][i].replace('(', '').replace(')', '').replace('T', ''))
+                annual_from_db[column][i] = -abs(converted3) * 1000000
+            elif ')' in annual_from_db[column][i]:
+                converted0 = float(annual_from_db[column][i].replace('(', '').replace(')', ''))
+                annual_from_db[column][i] = -abs(converted0)
             else:
                 continue
         else:
@@ -40,27 +54,72 @@ for column in annual_from_db.iloc[:, 2:]:
             elif 'K' in annual_from_db[column][i]:
                 converted2 = float(annual_from_db[column][i].replace('K', ''))
                 annual_from_db[column][i] = converted2/1000
+            elif '%' in annual_from_db[column][i]:
+                converted3 = float(annual_from_db[column][i].replace('%', '').replace(',', ''))
+                annual_from_db[column][i] = converted3
+            elif '-' in annual_from_db[column][i]:
+                converted = float(annual_from_db[column][i].replace('-', 'nan'))
+                annual_from_db[column][i] = converted
+            elif 'T' in annual_from_db[column][i]:
+                converted3 = float(annual_from_db[column][i].replace('(', '').replace(')', '').replace('T', ''))
+                annual_from_db[column][i] = -abs(converted3) * 1000000
             else:
                 continue
 
-            # cleaned_tmp = annual_from_db[column].loc[annual_from_db[column].str.contains('()', na=False, regex=True)][column].replace('(','').replace(')', '').replace('M', '')
-            # annual_from_db[column][annual_from_db[column].str.contains('M')] = cleaned_tmp.astype(str)
-# for column in annual_from_db.iloc[:, 4:]:
-#     for i in range(len(annual_from_db[column])):
-#         cleaned_tmp = annual_from_db[column].loc[annual_from_db[column].str.contains('B', na=False, regex=True)].str.strip('()')
-#         naujas_tmp = cleaned_tmp.str.replace('B', '').astype(float)*1000
-#         annual_from_db[column][annual_from_db[column].str.contains('B')] = naujas_tmp.astype(str)
-#
-#         cleaned1_tmp = annual_from_db[column].loc[annual_from_db[column].str.contains('M', na=False, regex=True)].str.strip('()')
-#         naujas_tmp = cleaned1_tmp.str.replace('M', '').astype(float)
-#         annual_from_db[column][annual_from_db[column].str.contains('M')] = naujas_tmp.astype(str)
-#
-#         cleaned2_tmp = annual_from_db[column].loc[annual_from_db[column].str.contains('K', na=False, regex=True)].str.strip('()')
-#         naujas_tmp = cleaned2_tmp.str.replace('K', '').astype(float)/1000
-#         annual_from_db[column][annual_from_db[column].str.contains('K')] = naujas_tmp.astype(str)
-#
-#         cleaned3_tmp = annual_from_db[column].loc[annual_from_db[column].str.contains('%', na=False, regex=True)].str.strip('()')
-#         naujas_tmp = cleaned3_tmp.str.replace('%', '').astype(float)
-#         annual_from_db[column][annual_from_db[column].str.contains('%')] = naujas_tmp.astype(str)
+set_to_database(annual_from_db, 'annual_data_p')
+print('Pirmas done')
+for column in quater_from_db.iloc[:, 2:]:
+    for i in range(len(quater_from_db[column])):
+        if "(" in quater_from_db[column][i]:
+            if 'M' in quater_from_db[column][i]:
+                converted = float(quater_from_db[column][i].replace('(', '').replace(')', '').replace('M', ''))
+                quater_from_db[column][i] = -abs(converted)   #cia gali buti daugyba is -1
+            elif 'B' in quater_from_db[column][i]:
+                converted1 = float(quater_from_db[column][i].replace('(', '').replace(')', '').replace('B', ''))
+                quater_from_db[column][i] = -abs(converted1)* 1000
+            elif 'K' in quater_from_db[column][i]:
+                converted2 = float(quater_from_db[column][i].replace('(', '').replace(')', '').replace('K', ''))
+                quater_from_db[column][i] = -abs(converted2)/1000
+            elif 'T' in quater_from_db[column][i]:
+                converted3 = float(quater_from_db[column][i].replace('(', '').replace(')', '').replace('T', ''))
+                quater_from_db[column][i] = -abs(converted3) * 1000000
+            elif ')' in quater_from_db[column][i]:
+                converted0 = float(quater_from_db[column][i].replace('(', '').replace(')', ''))
+                quater_from_db[column][i] = -abs(converted0)
+            else:
+                continue
+        else:
+            if 'M' in quater_from_db[column][i]:
+                converted = float(quater_from_db[column][i].replace('M', ''))
+                quater_from_db[column][i] = converted
+            elif 'B' in quater_from_db[column][i]:
+                converted1 = float(quater_from_db[column][i].replace('B', ''))
+                quater_from_db[column][i] = converted1* 1000
+            elif 'K' in quater_from_db[column][i]:
+                converted2 = float(quater_from_db[column][i].replace('K', ''))
+                quater_from_db[column][i] = converted2/1000
+            elif '%' in quater_from_db[column][i]:
+                converted3 = float(quater_from_db[column][i].replace('%', '').replace(',', ''))
+                quater_from_db[column][i] = converted3
+            elif '-' in quater_from_db[column][i]:
+                converted = float(quater_from_db[column][i].replace('-', 'nan'))
+                quater_from_db[column][i] = converted
+            elif 'T' in quater_from_db[column][i]:
+                converted3 = float(quater_from_db[column][i].replace('(', '').replace(')', '').replace('T', ''))
+                quater_from_db[column][i] = -abs(converted3) * 1000000
+            else:
+                continue
 
-print(annual_from_db)
+
+print('Antras done')
+
+set_to_database(quater_from_db, 'quarter_data_p')
+
+second = datetime.datetime.now()
+
+
+
+
+
+
+print("laikas =  ", second - first)
