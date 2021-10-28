@@ -30,7 +30,7 @@ for t in unique_tickers_Y:
         date_ticker_tmp = pd.DataFrame(t_tmp_ticker.iloc[idx+1]).transpose()      #data ir tickeris
         res1 = t_tmp.iloc[idx + 1]
         res2 = t_tmp.iloc[idx]
-        difference = res1 - res2
+        difference = ((res1 - res2) *100)/res2
         difference = pd.DataFrame(difference).transpose()   #apskaiciuotas skirtumas
         date_ticker_tmp.index = difference.index
         # dabar sujungiu abu df ir turiu gauti viena vietisa eilute su data, tickeriu ir skirtumais
@@ -56,7 +56,7 @@ for t in unique_tickers_Q:
         date_ticker_tmp = pd.DataFrame(t_tmp_ticker.iloc[idx+1]).transpose()      #data ir tickeris
         res1 = t_tmp.iloc[idx + 1]
         res2 = t_tmp.iloc[idx]
-        difference = res1 - res2
+        difference = ((res1 - res2) *100)/res2
         difference = pd.DataFrame(difference).transpose()   #apskaiciuotas skirtumas
         date_ticker_tmp.index = difference.index
         # dabar sujungiu abu df ir turiu gauti viena vietisa eilute su data, tickeriu ir skirtumais
