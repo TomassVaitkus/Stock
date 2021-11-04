@@ -119,6 +119,9 @@ first = datetime.datetime.now()
 
 # for column in main_from_db:
 #     print(column)
+
+
+# einam per finvizo duomenis ir issivalom puses metu perfomansa, kad butu tvarkingi skaiciai.
 for i in range(len(main_from_db['Perf Half'])):
     print(i)
     if "(" in main_from_db['Perf Half'][i]:

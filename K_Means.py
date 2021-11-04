@@ -6,43 +6,60 @@ import sqlite3 as sql
 import pandas as pd
 import numpy as np
 import yfinance as yf
+import datetime
 
 def get_data_from_db(inp2):
     conn = sql.connect('data_base.db')
     result = pd.read_sql('SELECT * FROM ' + inp2, conn)
     conn.close()
     return result
-def get_data_from_db_Y(inp2):
-    conn = sql.connect('data_base.db')
-    result = pd.read_sql('SELECT "Date" FROM ' + inp2, conn)
-    conn.close()
-    return result
 
 # data_Y = get_data_from_db('annual_data_p')      #pasiimu is db visa data
-# unique_tickers_Y = list(data_Y['Ticker'].unique() )       #pasiimu tickerius ir pasidarau juos unikalius ir tai bus inputas i
+# ticker = list(data_Y['Ticker'].unique() )       #pasiimu tickerius ir pasidarau juos unikalius ir tai bus inputas i
                                                     # istoriniu duomenu funkcija
 ticker= ['TSLA', 'AMZN']
-date_start = get_data_from_db_Y('differences_Y') #
-date_end = date_start + 1 #str(input('ivesk pabaigos data: '))
-
-def get_price_perfomance(inp_tick, inp_date_start, inp_date_end):
-    perfomace_list = []
-    for i in inp_tick:
-        data_start_price = float(yf.download(i, inp_date_start, inp_date_start)['Adj Close'].values)
-        data_end_price = float(yf.download(i, inp_date_end, inp_date_end)['Adj Close'].values)
-        perfomance = ((data_end_price - data_start_price)*100)/data_start_price
-        print(perfomance)
-        perfomace_list.append(perfomance)
-    return perfomace_list
+date_start = get_data_from_db('differences_Y')['Date'].unique()#pasiimam datas is db
+date_start = sorted(date_start)[-5:]
+date_end = pd.Series(date_start).astype(int)+1 #pasidarompabaigos data pridedami vienus metus prie date_start
 
 
-perfomance_df = pd.DataFrame(get_price_perfomance(ticker, date_start, date_end))
+perfomace_list = []     #gautas perfomansas liste procentais
+ticker_list = []        # naudotu tickeriu listas
+perfomance_date= []     # perfomanso data listas
 
 
+for t in ticker:
+    # perfomance_df = pd.DataFrame(columns=['Ticker', 'Perfomance Date', 'Perfomance'])
+    count = len(date_start)     # kaunteris tam, kad neimtu paskutiniu metu
+    while count > 1:
+        for i in date_start:
+            data_start_price = float(yf.download(t, str(i) + '-01-01', str(i) + '-01-06')['Adj Close'].values[1])
+            data_end_price = float(yf.download(t, str(i) + '-12-25', str(i) + '-12-31')['Adj Close'].values[1])
+            perfomance = ((data_end_price - data_start_price) * 100) / data_start_price
+            print(perfomance)
+            perfomace_list.append(perfomance)
+            ticker_list.append(t)
+            perfomance_date.append(i)
+            count = count-1
+            if count == 1:
+                break
 
 
+perfomance_df = pd.DataFrame({'Ticker': ticker_list, 'Perfomance Date': perfomance_date, 'Perfomance %': perfomace_list})
+
+#paimam perfomansa is yahoo kiekvienos kompanijos
+# def get_price_perfomance(inp_tick, inp_date_start, inp_date_end):
+#     perfomace_list = []
+#     for i in inp_tick:
+#         data_start_price = float(yf.download(i, inp_date_start, inp_date_start)['Adj Close'].values)
+#         data_end_price = float(yf.download(i, inp_date_end, inp_date_end)['Adj Close'].values)
+#         perfomance = ((data_end_price - data_start_price)*100)/data_start_price
+#         print(perfomance)
+#         perfomace_list.append(perfomance)
+#     return perfomace_list
 
 
+# perfomance_df = pd.DataFrame(get_price_perfomance(ticker, date_start, date_end))
 
 column_list = ['Sales/Revenue','Sales Growth','Cost of Goods Sold (COGS) incl. D&A']
 column_list.insert(0,'Date')

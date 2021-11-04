@@ -18,7 +18,30 @@
 #
 # print(new_df)
 
+# count = 5
+# l = ['a','b','c','d','e','f','g','h']
+# while count > 1:
+#     for i in l:
+#         print(i)
+#         count = count -1
+#         if count == 1:
+#             break
 
+# import sqlite3 as sql
+# import pandas as pd
+#
+#
+# def get_data_from_db(inp2):
+#     conn = sql.connect('data_base.db')
+#     result = pd.read_sql('SELECT * FROM ' + inp2, conn)
+#     conn.close()
+#     return result
+#
+#
+# a = get_data_from_db('differences_Y')
+#
+#
+# print('la')
 
 
 
