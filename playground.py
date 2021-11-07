@@ -71,5 +71,8 @@
 #
 #
 # print("l")
+# Import Tkinter library
+# importing only those functions
+# which are needed
 
 
