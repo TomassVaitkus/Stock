@@ -107,11 +107,12 @@ def function_for_clustering():      #klasterizavimo funkcija
 
     my_companies = my_companies[['Ticker','Perfomance %']]
     print(my_companies)
-    return my_companies
 
-def function_for_table_in_pages():      # sukrauna i lentele antroj papkutej
+    return my_companies, cluster_m, df
+
+def function_for_table_in_pages():      # sukrauna i lentele
     final_table = my_companies.to_dict('index')
-    table_in_page2 = TableCanvas(page2, data=final_table, cellwidth=150, width=750, pady=10)
+    table_in_page2 = TableCanvas(frame_for_table, data=final_table, cellwidth=150, width=750, pady=10)
     table_in_page2.show()
 
 
@@ -130,17 +131,17 @@ root = Tk()
 root.geometry('700x700')
 root.title('Companies Clustering Aplication')
 
-nb = ttk.Notebook(root)
-page1 = ttk.Frame(nb)
-nb.add(page1, text='Settings')
-page2 = ttk.Frame(nb)
-nb.add(page2, text = 'Result')
+# nb = ttk.Notebook(root)
+# page1 = ttk.Frame(nb)
+# nb.add(page1, text='Settings')
+# page2 = ttk.Frame(nb)
+# nb.add(page2, text = 'Result')
 
-Entry_label_frame = LabelFrame(page1, text = 'Enter Parameters')
+Entry_label_frame = LabelFrame(root, text = 'Enter Parameters')
 Entry_label_frame.grid(row = 0, column = 0,sticky = N)
-three_button_frame = LabelFrame(page1)
+three_button_frame = LabelFrame(root)
 three_button_frame.grid(row = 3, column = 0, sticky = 'w')
-checkbox_frame = LabelFrame(page1, text = 'Select Parameters')
+checkbox_frame = LabelFrame(root, text = 'Select Parameters')
 checkbox_frame.grid(row = 2, column = 0, sticky = 'w',padx = 10,pady = 10)
 
 
@@ -186,12 +187,15 @@ for i in list(get_data_from_db('differences_Y'))[3:]:
 print(Varlist)
 
 #======================================== Page2 =====================
-table2 = TableCanvas(page2)
+frame_for_table = LabelFrame(root, text = 'Table')
+frame_for_table.grid(row = 2, column = 1, sticky = E)
+table2 = TableCanvas(frame_for_table)
+# table2.grid(row = 2, column = 1, sticky = E)
 table2.show()
 
 
 
-nb.pack(fill=BOTH, expand=1)
+# nb.pack(fill=BOTH, expand=1)
 root.mainloop()
 
 
