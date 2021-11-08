@@ -3,8 +3,8 @@
 # # import random
 # import sqlite3 as sql
 # # from sklearn.cluster import KMeans
-# #
-#
+import matplotlib.pyplot as plt
+import numpy as np
 #
 #
 # def get_data_from_db(inp2):
@@ -74,5 +74,28 @@
 # Import Tkinter library
 # importing only those functions
 # which are needed
+import tkinter as tk
+from tkinter import  *
 
+root = tk.Tk()
+choices = ('network one', 'network two', 'network three')
+var = tk.StringVar(root)
+entry = Entry(root)
+entry.grid()
+def refresh():
+    # Reset var and delete all old options
+    var.set('')
+    network_select['menu'].delete(0, 'end')
 
+    # Insert list of new options (tk._setit hooks them up to var)
+    new_choices = [str(x) for x in str(list(range(int(entry.get())))) if x.isdigit()]
+    for choice in new_choices:
+        network_select['menu'].add_command(label=choice, command=tk._setit(var, choice))
+
+network_select = tk.OptionMenu(root, var, *choices)
+network_select.grid()
+
+# I made this quick refresh button to demonstrate
+tk.Button(root, text='Refresh', command=refresh).grid()
+
+root.mainloop()
