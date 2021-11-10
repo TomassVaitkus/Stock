@@ -2,6 +2,7 @@ import threading
 import tkinter as tk
 
 import seaborn as sns
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from sklearn import datasets
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
@@ -47,11 +48,6 @@ def get_from_config_file():
     return saved_time, saved_cluster_nr, saved_companies_num
 
 
-
-
-
-
-
 def get_data_from_db(inp2):            # pasiima is duomenu bazes
     conn = sql.connect('data_base.db')
     result = pd.read_sql('SELECT * FROM ' + inp2, conn)
@@ -87,38 +83,53 @@ def get_column_list():              #pasiima sarasa parametru, kuriuos naudoja k
 
 def function_for_clustering():      #klasterizavimo funkcija
     global my_companies, clust_idx
-    user_years = get_from_config_file()[0]
-    cluster_nr = int(get_from_config_file()[1])
-    NCI = int(get_from_config_file()[2])
+                                                #pasikraunam reikiamus duomenis is config failo
+    user_years = get_entry_values()[0]
+    cluster_nr = int(get_entry_values()[1])
+    NCI = int(get_entry_values()[2])
+                                                    # Funkcija, kuri ismeta eilutes, kuriose yra Nan
     def check_and_drop_nan(inp1,inp2):
         new_df = inp1[inp2].dropna()
         return new_df
-
+                                                    #pasiimam perfomanso duomenis is db
     perfomance_df_from_db = get_data_from_db('Perfomance_df').groupby(['Perfomance Date']).get_group(str(user_years)).reset_index()
-
+                                                    #
     mydata = check_and_drop_nan(get_data_from_db('differences_Y'), get_column_list()).reset_index(drop=True)
     grouped_tmp = mydata.groupby(['Date']).get_group(str(user_years))
     grouped_final = grouped_tmp.replace([np.inf, -np.inf], np.nan).dropna(axis=0).reset_index().iloc[:,1:]
-    mydata_numpy = grouped_final.iloc[:,2:].to_numpy()
 
-    mydata_prediction = KMeans(n_clusters=cluster_nr).fit_predict(mydata_numpy)
 
+    df_for_logic = pd.DataFrame(columns=get_column_list())
+
+    for col in grouped_final.iloc[:, 2:]:
+        col_max = [grouped_final[col].mean() + 3 * grouped_final[col].std()]
+        col_min = [grouped_final[col].mean() - 3 * grouped_final[col].std()]
+        df_for_logic[col] = grouped_final[col].between(col_min[0],col_max[0])
+
+    data_without_outliers = grouped_final.iloc[:,2:][~(df_for_logic.iloc[:,2:] == 0).any(axis=1)]
+
+
+
+    mydata_for_fitting = data_without_outliers.to_numpy()
+
+    model = KMeans(n_clusters=cluster_nr).fit(mydata_for_fitting)
+    mydata_for_prediction = grouped_final.iloc[:,2:].to_numpy()
+    prediction = model.predict(mydata_for_prediction)
+
+
+    clustered_df = pd.concat([grouped_final, pd.DataFrame(prediction)], axis=1)   #cia priglaudziu labelius prie klasterizuojamu duomenu
 
 
     # fig = plt.figure(figsize = (10, 7))
     # ax = plt.axes(projection ="3d")
     #
-    # ax.scatter3D(grouped_final['Sales/Revenue'], grouped_final['Sales Growth'], grouped_final['Cost of Goods Sold (COGS) incl. D&A'], c=mydata_prediction )
+    # ax.scatter3D(grouped_final['Sales/Revenue'], grouped_final['Sales Growth'], grouped_final['Cost of Goods Sold (COGS) incl. D&A'], c=prediction )
     # plt.title("3D ploting")
     # plt.show()
-
-    clustered_df = pd.concat([grouped_final, pd.DataFrame(mydata_prediction)], axis=1)   #cia priglaudziu labelius prie klasterizuojamu duomenu
-
 
     perf_list = []
 
     for i in clustered_df['Ticker']:
-        print(i)
         try:
             perf = float(perfomance_df_from_db.groupby('Ticker').get_group(i)['Perfomance %'])
             perf_list.append(perf)
@@ -132,13 +143,27 @@ def function_for_clustering():      #klasterizavimo funkcija
 
     cluster_m = []
     clust_idx = []
+    clust_perf_list_in_list = []
     for i in range(cluster_nr):
-        cluster_i = clustered_df.groupby([0]).get_group(i)
+        cluster_i = clustered_df.groupby([0]).get_group(i).dropna()
+        clust_perf_list_in_list.append(list(cluster_i['Perfomance %']))
         clust_perf_mean = cluster_i['Perfomance %'].mean(axis=0, skipna=True)
         cluster_m.append(clust_perf_mean)
         clust_idx.append(i)
 
 
+#===================================================   Chart   ===============================================
+
+    example_data = clust_perf_list_in_list
+    fig7, ax7 = plt.subplots()
+    ax7.set_title('Cluster BoxPlot')
+    ax7.boxplot(example_data)
+    canvas = FigureCanvasTkAgg(fig7, master=root)
+    canvas.get_tk_widget().xview_scroll(400, "units")
+    canvas.get_tk_widget().yview_scroll(300, "units")
+    canvas.draw()
+    canvas.get_tk_widget().grid(row = 2, column = 1)
+# ==================================================================================================
     winner_clust = cluster_m.index(max(cluster_m))
 
     #dabar traukiam laimetojo klasterio dar nekilusias koompanijas
@@ -151,18 +176,8 @@ def function_for_clustering():      #klasterizavimo funkcija
 
     my_companies = my_companies[['Ticker','Perfomance %']]
     print(my_companies)
-    # max_of_my_companies = np.array(max(my_companies['Perfomance %']))
-    # min_of_my_companies = np.array(min(my_companies['Perfomance %']))
-    for i in range(cluster_nr):
-        clust_i = clustered_df.groupby([0]).get_group(i)
-        sns.boxplot(clust_i['Perfomance %'], orient = 'V')
 
-    return my_companies, cluster_m, df
-
-#
-# def select_clusters_to_view():
-#
-
+    return my_companies, cluster_m, df, clust_perf_list_in_list
 
 
 
@@ -173,21 +188,18 @@ def function_for_table_in_pages():      # sukrauna i lentele
 
 
 def refresh():
-    # Reset var and delete all old options
+    # cia issitrinam viska, kas buvo dropmenu
     var.set('')
     cluster_menu['menu'].delete(0, 'end')
 
-    # Insert list of new options (tk._setit hooks them up to var)
-    new_choices = [str(x) for x in str(list(range(int(entry_cluster_num.get())))) if x.isdigit()]
+    # ikraunam naujas vertes (tk._setit sitas dalykas ikrauna atgal i var)
+    new_choices = [str(x) for x in str(list(range(int(entry_cluster_num.get()))))if x.isdigit()]
     for choice in new_choices:
         cluster_menu['menu'].add_command(label=choice, command=tk._setit(var, choice))
 
 
 def combined_function():                # visu funkciju motina
     refresh()
-    set_year_to_cluster_conf()
-    set_number_to_cluster_conf()
-    set_number_of_companies_conf()
     add_parameters_to_list()
     function_for_clustering()
     function_for_table_in_pages()
@@ -200,7 +212,7 @@ def combined_function():                # visu funkciju motina
 
 
 root = Tk()
-root.geometry('1300x520')
+root.geometry('1300x620')
 root.title('Companies Clustering Aplication')
 
 var = StringVar(root)
@@ -270,30 +282,12 @@ for i in list(get_data_from_db('differences_Y'))[3:]:
     text.window_create("end", window=cb)
     text.insert("end", "\n")
     Varlist.append(var)
-print(Varlist)
 
-#======================================== Page2 =====================
 frame_for_table = LabelFrame(root, text = 'Table')
 frame_for_table.grid(row = 2, column = 0, sticky = E)
-# table2 = TableCanvas(frame_for_table)
-# # table2.grid(row = 2, column = 1, sticky = E)
-# table2.show()
 
-
-
-# nb.pack(fill=BOTH, expand=1)
 root.mainloop()
 
-
-
-
-
-
-# parser = ConfigParser()
-# parser.read('Configuration_stock_file.ini')
-# parser.set('entry_values', 'numb_clusters', entry_cluster_num.get())
-# with open('Configuration_stock_file.ini', 'w') as configfile:
-#     parser.write(configfile)
 
 
 
